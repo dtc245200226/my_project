@@ -1,0 +1,1568 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hệ thống Quản lý Thực tập sinh - Hồ sơ thực tập</title>
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        /* ==================== 1. CSS VARIABLES & RESET ==================== */
+        :root {
+            --primary: #1976D2;
+            --primary-hover: #1565C0;
+            --primary-light: #E3F2FD;
+            --primary-ring: rgba(25, 118, 210, 0.2);
+            
+            --success: #2E7D32;
+            --success-bg: #E8F5E9;
+            --warning: #ED6C02;
+            --warning-bg: #FFF4E5;
+            --danger: #D32F2F;
+            --danger-bg: #FFEBEE;
+            
+            --bg-body: #F4F7FB;
+            --surface: #FFFFFF;
+            --surface-hover: #F8FAFC;
+            --border: #E2E8F0;
+            --border-focus: #1976D2;
+            
+            --text-main: #1E293B;
+            --text-muted: #64748B;
+            --text-sub: #94A3B8;
+            
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            
+            --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.04);
+            --shadow-sm: 0 2px 8px -2px rgba(15, 23, 42, 0.06), 0 1px 4px -1px rgba(15, 23, 42, 0.04);
+            --shadow-md: 0 8px 24px -4px rgba(15, 23, 42, 0.08), 0 4px 10px -2px rgba(15, 23, 42, 0.03);
+            
+            --sidebar-width: 260px;
+            --header-height: 72px;
+            --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            overflow-x: hidden;
+        }
+
+        /* ==================== 2. SIDEBAR NAVIGATION ==================== */
+        .sidebar {
+            width: var(--sidebar-width);
+            background: var(--surface);
+            border-right: 1px solid var(--border);
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+            display: flex;
+            flex-direction: column;
+            z-index: 50;
+            transition: var(--transition);
+        }
+
+        .brand {
+            height: var(--header-height);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 0 24px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .brand-logo-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--primary), #0D47A1);
+            color: #fff;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 10px rgba(25, 118, 210, 0.35);
+        }
+
+        .brand-text h1 {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--text-main);
+            line-height: 1.2;
+        }
+
+        .brand-text span {
+            font-size: 11px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 600;
+        }
+
+        .nav-menu {
+            padding: 20px 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .nav-label {
+            font-size: 11px;
+            text-transform: uppercase;
+            font-weight: 700;
+            color: var(--text-sub);
+            letter-spacing: 0.8px;
+            padding: 8px 12px 4px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 14px;
+            border-radius: var(--radius-sm);
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 600;
+            transition: var(--transition);
+            cursor: pointer;
+            border: none;
+            background: transparent;
+            width: 100%;
+            text-align: left;
+        }
+
+        .nav-item:hover {
+            color: var(--primary);
+            background-color: var(--primary-light);
+            transform: translateX(4px);
+        }
+
+        .nav-item.active {
+            color: var(--primary);
+            background-color: var(--primary-light);
+            font-weight: 700;
+            position: relative;
+        }
+
+        .nav-item.active::before {
+            content: '';
+            position: absolute;
+            left: -4px;
+            top: 20%;
+            bottom: 20%;
+            width: 4px;
+            border-radius: 4px;
+            background: var(--primary);
+        }
+
+        .nav-badge {
+            margin-left: auto;
+            background: #EF4444;
+            color: white;
+            font-size: 11px;
+            padding: 2px 7px;
+            border-radius: 10px;
+            font-weight: 700;
+        }
+
+        .sidebar-footer {
+            padding: 16px;
+            border-top: 1px solid var(--border);
+        }
+
+        .logout-btn {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 14px;
+            width: 100%;
+            border-radius: var(--radius-sm);
+            background: transparent;
+            border: 1px solid transparent;
+            color: var(--danger);
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .logout-btn:hover {
+            background-color: var(--danger-bg);
+            border-color: rgba(211, 47, 47, 0.2);
+        }
+
+        /* ==================== 3. MAIN LAYOUT & HEADER ==================== */
+        .main-wrapper {
+            margin-left: var(--sidebar-width);
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            transition: var(--transition);
+        }
+
+        .top-header {
+            height: var(--header-height);
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 32px;
+            position: sticky;
+            top: 0;
+            z-index: 40;
+            backdrop-filter: blur(8px);
+        }
+
+        .header-title h2 {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        .header-title p {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .search-box {
+            position: relative;
+            width: 280px;
+        }
+
+        .search-box input {
+            width: 100%;
+            height: 42px;
+            padding: 0 16px 0 42px;
+            background: var(--bg-body);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            font-size: 13px;
+            color: var(--text-main);
+            transition: var(--transition);
+            outline: none;
+            font-family: inherit;
+        }
+
+        .search-box input:focus {
+            background: var(--surface);
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px var(--primary-ring);
+        }
+
+        .search-box .search-icon {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            pointer-events: none;
+        }
+
+        .icon-btn {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: var(--transition);
+            position: relative;
+        }
+
+        .icon-btn:hover {
+            color: var(--primary);
+            background-color: var(--primary-light);
+            border-color: rgba(25, 118, 210, 0.3);
+        }
+
+        .pulse-dot {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            width: 8px;
+            height: 8px;
+            background: #EF4444;
+            border-radius: 50%;
+            border: 2px solid var(--surface);
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding-left: 12px;
+            border-left: 1px solid var(--border);
+            cursor: pointer;
+        }
+
+        .user-avatar {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #1976D2, #64B5F6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            font-size: 15px;
+            box-shadow: 0 2px 6px rgba(25, 118, 210, 0.3);
+            border: 2px solid #fff;
+        }
+
+        .user-info {
+            line-height: 1.3;
+        }
+
+        .user-name {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        .user-role {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        .menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--text-main);
+        }
+
+        /* ==================== 4. MAIN CONTENT AREA ==================== */
+        .content-container {
+            padding: 32px;
+            max-width: 1200px;
+            width: 100%;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 28px;
+        }
+
+        /* Banner Status Bar */
+        .status-hero-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 24px;
+            box-shadow: var(--shadow-sm);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .status-hero-card::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 6px;
+            background: var(--primary);
+        }
+
+        .status-left {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+        }
+
+        .status-badge-icon {
+            width: 52px;
+            height: 52px;
+            border-radius: 14px;
+            background: var(--primary-light);
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .status-texts h3 {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text-main);
+            margin-bottom: 4px;
+        }
+
+        .status-texts p {
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        .status-selector-group {
+            display: flex;
+            align-items: center;
+            background: var(--bg-body);
+            padding: 4px;
+            border-radius: 10px;
+            gap: 4px;
+            border: 1px solid var(--border);
+        }
+
+        .status-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            background: transparent;
+            color: var(--text-muted);
+            transition: var(--transition);
+        }
+
+        .status-pill .indicator-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: currentColor;
+        }
+
+        .status-pill.active.incomplete {
+            background: var(--danger-bg);
+            color: var(--danger);
+            box-shadow: var(--shadow-xs);
+        }
+
+        .status-pill.active.pending {
+            background: var(--warning-bg);
+            color: var(--warning);
+            box-shadow: var(--shadow-xs);
+        }
+
+        .status-pill.active.approved {
+            background: var(--success-bg);
+            color: var(--success);
+            box-shadow: var(--shadow-xs);
+        }
+
+        /* Grid Layout for Form & Upload */
+        .content-grid {
+            display: grid;
+            grid-template-columns: 1fr 1.15fr;
+            gap: 28px;
+            align-items: start;
+        }
+
+        /* Generic Card Style */
+        .app-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 28px;
+            box-shadow: var(--shadow-sm);
+            transition: var(--transition);
+        }
+
+        .app-card:hover {
+            box-shadow: var(--shadow-md);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .card-header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .card-header-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            background: var(--primary-light);
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .card-header h4 {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        .card-header p {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        /* Form Controls */
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 18px;
+        }
+
+        .form-row-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 7px;
+        }
+
+        .form-group label {
+            font-size: 13px;
+            font-weight: 600;
+            color: #334155;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .form-group label .required {
+            color: var(--danger);
+        }
+
+        .input-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .input-wrapper i, .input-wrapper .input-icon {
+            position: absolute;
+            left: 14px;
+            color: var(--text-sub);
+            pointer-events: none;
+        }
+
+        .input-control {
+            width: 100%;
+            height: 44px;
+            padding: 0 14px 0 42px;
+            background: var(--surface);
+            border: 1.5px solid var(--border);
+            border-radius: var(--radius-sm);
+            font-size: 14px;
+            color: var(--text-main);
+            outline: none;
+            transition: var(--transition);
+            font-family: inherit;
+        }
+
+        .input-control:focus {
+            border-color: var(--border-focus);
+            box-shadow: 0 0 0 3px var(--primary-ring);
+        }
+
+        select.input-control {
+            appearance: none;
+            cursor: pointer;
+            padding-right: 36px;
+        }
+
+        .select-chevron {
+            position: absolute;
+            right: 14px;
+            pointer-events: none;
+            color: var(--text-sub);
+        }
+
+        /* Upload Area Styles */
+        .upload-section {
+            display: flex;
+            flex-direction: column;
+            gap: 22px;
+        }
+
+        .upload-box {
+            border: 2px dashed #CBD5E1;
+            border-radius: var(--radius-md);
+            padding: 24px;
+            text-align: center;
+            background: #FAFCFF;
+            transition: var(--transition);
+            cursor: pointer;
+            position: relative;
+        }
+
+        .upload-box:hover, .upload-box.dragover {
+            border-color: var(--primary);
+            background: #F0F7FF;
+        }
+
+        .upload-box input[type="file"] {
+            position: absolute;
+            inset: 0;
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+            z-index: 10;
+        }
+
+        .upload-icon-circle {
+            width: 48px;
+            height: 48px;
+            background: var(--primary-light);
+            color: var(--primary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 12px;
+            transition: var(--transition);
+        }
+
+        .upload-box:hover .upload-icon-circle {
+            transform: scale(1.1);
+        }
+
+        .upload-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text-main);
+            margin-bottom: 4px;
+        }
+
+        .upload-desc {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        .upload-desc span {
+            color: var(--primary);
+            font-weight: 600;
+            text-decoration: underline;
+        }
+
+        /* File List Items */
+        .file-list-group {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-top: 6px;
+        }
+
+        .file-item-card {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 14px 16px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            box-shadow: var(--shadow-xs);
+            transition: var(--transition);
+        }
+
+        .file-item-card:hover {
+            border-color: #CBD5E1;
+            background: var(--surface-hover);
+        }
+
+        .file-info-left {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            min-width: 0;
+        }
+
+        .file-type-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            background: #FEE2E2;
+            color: #DC2626;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 12px;
+            flex-shrink: 0;
+        }
+
+        .file-type-icon.doc {
+            background: #DBEAFE;
+            color: #2563EB;
+        }
+
+        .file-details {
+            min-width: 0;
+        }
+
+        .file-name {
+            font-size: 13.5px;
+            font-weight: 600;
+            color: var(--text-main);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 200px;
+        }
+
+        .file-meta {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 11.5px;
+            color: var(--text-muted);
+            margin-top: 3px;
+        }
+
+        .file-badge {
+            font-size: 11px;
+            padding: 2px 8px;
+            border-radius: 6px;
+            font-weight: 600;
+        }
+
+        .file-badge.verified {
+            background: var(--success-bg);
+            color: var(--success);
+        }
+
+        .file-badge.waiting {
+            background: var(--warning-bg);
+            color: var(--warning);
+        }
+
+        .file-actions {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-action {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 7px 12px;
+            font-size: 12px;
+            font-weight: 600;
+            border-radius: 6px;
+            border: 1px solid var(--border);
+            background: var(--surface);
+            color: var(--text-main);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .btn-action:hover {
+            background: var(--bg-body);
+            border-color: #CBD5E1;
+            color: var(--primary);
+        }
+
+        .btn-action.btn-delete {
+            color: var(--danger);
+            border-color: #FECACA;
+            background: #FEF2F2;
+        }
+
+        .btn-action.btn-delete:hover {
+            background: var(--danger-bg);
+            color: #B91C1C;
+        }
+
+        /* Action Buttons Area */
+        .form-actions-bar {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 14px;
+            margin-top: 10px;
+        }
+
+        .btn-secondary {
+            padding: 12px 24px;
+            border-radius: var(--radius-sm);
+            background: var(--surface);
+            border: 1px solid var(--border);
+            color: var(--text-muted);
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .btn-secondary:hover {
+            background: var(--bg-body);
+            color: var(--text-main);
+        }
+
+        .btn-primary {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 28px;
+            border-radius: var(--radius-sm);
+            background: var(--primary);
+            border: none;
+            color: #FFFFFF;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(25, 118, 210, 0.3);
+            transition: var(--transition);
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-hover);
+            transform: translateY(-1px);
+            box-shadow: 0 6px 16px rgba(25, 118, 210, 0.4);
+        }
+
+        .btn-primary:active {
+            transform: translateY(0);
+        }
+
+        /* Notification / Toast */
+        .toast-alert {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: #1E293B;
+            color: #fff;
+            padding: 16px 22px;
+            border-radius: var(--radius-md);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            transform: translateY(120%);
+            opacity: 0;
+            transition: all 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 100;
+        }
+
+        .toast-alert.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .toast-icon {
+            color: #22C55E;
+        }
+
+        .toast-content h5 {
+            font-size: 14px;
+            font-weight: 700;
+            margin-bottom: 2px;
+        }
+
+        .toast-content p {
+            font-size: 12px;
+            color: #94A3B8;
+        }
+
+        /* Modal Preview */
+        .preview-modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(4px);
+            z-index: 200;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .preview-modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: var(--surface);
+            border-radius: var(--radius-md);
+            width: 100%;
+            max-width: 550px;
+            padding: 24px;
+            box-shadow: var(--shadow-md);
+            position: relative;
+            animation: modalFadeIn 0.2s ease-out;
+        }
+
+        @keyframes modalFadeIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .modal-header h4 {
+            font-size: 16px;
+            font-weight: 700;
+        }
+
+        .modal-close-btn {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            padding: 4px;
+            border-radius: 6px;
+        }
+
+        .modal-close-btn:hover {
+            color: var(--text-main);
+            background: var(--bg-body);
+        }
+
+        .modal-body {
+            background: var(--bg-body);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: 20px;
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 13px;
+        }
+
+        /* ==================== 5. RESPONSIVE DESIGN ==================== */
+        @media (max-width: 1024px) {
+            .content-grid {
+                grid-template-columns: 1fr;
+            }
+            .sidebar {
+                transform: translateX(-100%);
+            }
+            .sidebar.mobile-open {
+                transform: translateX(0);
+            }
+            .main-wrapper {
+                margin-left: 0;
+            }
+            .menu-toggle {
+                display: flex;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .top-header {
+                padding: 0 16px;
+            }
+            .content-container {
+                padding: 16px;
+                gap: 20px;
+            }
+            .status-hero-card {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 16px;
+            }
+            .status-selector-group {
+                width: 100%;
+                overflow-x: auto;
+            }
+            .form-row-2 {
+                grid-template-columns: 1fr;
+            }
+            .search-box {
+                display: none;
+            }
+            .user-name, .user-role {
+                display: none;
+            }
+            .user-profile {
+                border-left: none;
+                padding-left: 0;
+            }
+            .file-name {
+                max-width: 140px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ==================== SIDEBAR ==================== -->
+    <aside class="sidebar" id="sidebar">
+        <div class="brand">
+            <div class="brand-logo-icon">
+                <i data-lucide="graduation-cap"></i>
+            </div>
+            <div class="brand-text">
+                <h1>InternHub</h1>
+                <span>Quản lý thực tập</span>
+            </div>
+        </div>
+
+        <nav class="nav-menu">
+            <span class="nav-label">Menu Chính</span>
+            <button class="nav-item" onclick="switchNav(this)">
+                <i data-lucide="layout-dashboard"></i>
+                Trang chủ
+            </button>
+            <button class="nav-item" onclick="switchNav(this)">
+                <i data-lucide="user"></i>
+                Hồ sơ cá nhân
+            </button>
+            <button class="nav-item active" onclick="switchNav(this)">
+                <i data-lucide="briefcase"></i>
+                Hồ sơ thực tập
+            </button>
+            <button class="nav-item" onclick="switchNav(this)">
+                <i data-lucide="folder-kanban"></i>
+                Tài liệu
+            </button>
+            <button class="nav-item" onclick="switchNav(this)">
+                <i data-lucide="bell"></i>
+                Thông báo
+                <span class="nav-badge">3</span>
+            </button>
+
+            <span class="nav-label" style="margin-top: 14px;">Hệ Thống</span>
+            <button class="nav-item" onclick="switchNav(this)">
+                <i data-lucide="help-circle"></i>
+                Hướng dẫn & Trợ giúp
+            </button>
+            <button class="nav-item" onclick="switchNav(this)">
+                <i data-lucide="settings"></i>
+                Cài đặt tài khoản
+            </button>
+        </nav>
+
+        <div class="sidebar-footer">
+            <button class="logout-btn" onclick="handleLogout()">
+                <i data-lucide="log-out"></i>
+                Đăng xuất
+            </button>
+        </div>
+    </aside>
+
+    <!-- ==================== MAIN CONTENT WRAPPER ==================== -->
+    <div class="main-wrapper">
+        <!-- HEADER -->
+        <header class="top-header">
+            <div style="display: flex; align-items: center; gap: 14px;">
+                <button class="menu-toggle icon-btn" id="menuToggle" aria-label="Toggle menu">
+                    <i data-lucide="menu"></i>
+                </button>
+                <div class="header-title">
+                    <h2>Hồ sơ thực tập</h2>
+                    <p>Học kỳ Doanh nghiệp 2025 - 2026</p>
+                </div>
+            </div>
+
+            <div class="header-actions">
+                <div class="search-box">
+                    <i data-lucide="search" class="search-icon" style="width: 18px; height: 18px;"></i>
+                    <input type="text" placeholder="Tìm kiếm tài liệu, công ty...">
+                </div>
+
+                <button class="icon-btn" title="Thông báo" onclick="alert('Bạn có 3 thông báo mới từ phòng Đào tạo & Doanh nghiệp.')">
+                    <i data-lucide="bell" style="width: 19px; height: 19px;"></i>
+                    <span class="pulse-dot"></span>
+                </button>
+
+                <div class="user-profile" title="Xem trang cá nhân">
+                    <div class="user-avatar">
+                        NA
+                    </div>
+                    <div class="user-info">
+                        <div class="user-name">Hoàng Xuân Đoàn</div>
+                        <div class="user-role">K23E - CNTT & TT</div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- CONTAINER BODY -->
+        <main class="content-container">
+            <!-- 1. Trạng thái hồ sơ -->
+            <section class="status-hero-card">
+                <div class="status-left">
+                    <div class="status-badge-icon" id="statusIconWrap">
+                        <i data-lucide="clock" id="statusMainIcon"></i>
+                    </div>
+                    <div class="status-texts">
+                        <h3>Trạng thái hồ sơ: <span id="statusDisplayText" style="color: var(--warning);">Đang chờ duyệt</span></h3>
+                        <p id="statusHintText">Hồ sơ đã đầy đủ CV và Đơn xin thực tập. Giảng viên phụ trách đang kiểm duyệt.</p>
+                    </div>
+                </div>
+
+                <!-- Chuyển đổi trạng thái trực quan -->
+                <div class="status-selector-group" title="Chọn để xem trước các trạng thái hồ sơ">
+                    <button class="status-pill incomplete" onclick="setStatus('incomplete')">
+                        <span class="indicator-dot"></span>
+                        Chưa hoàn thiện
+                    </button>
+                    <button class="status-pill active pending" onclick="setStatus('pending')">
+                        <span class="indicator-dot"></span>
+                        Đang chờ duyệt
+                    </button>
+                    <button class="status-pill approved" onclick="setStatus('approved')">
+                        <span class="indicator-dot"></span>
+                        Đã duyệt
+                    </button>
+                </div>
+            </section>
+
+            <!-- 2. Grid Nội dung: Thông tin cá nhân & Tài liệu -->
+            <div class="content-grid">
+                
+                <!-- CARD 1: THÔNG TIN CÁ NHÂN -->
+                <section class="app-card">
+                    <div class="card-header">
+                        <div class="card-header-left">
+                            <div class="card-header-icon">
+                                <i data-lucide="user-check"></i>
+                            </div>
+                            <div>
+                                <h4>Thông tin sinh viên</h4>
+                                <p>Cập nhật thông tin thực tập sinh chính xác</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <form id="studentForm" onsubmit="event.preventDefault(); saveProfile();">
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label>Họ và tên <span class="required">*</span></label>
+                                <div class="input-wrapper">
+                                    <i data-lucide="user" class="input-icon" style="width: 18px; height: 18px;"></i>
+                                    <input type="text" id="fullName" class="input-control" value="Hoàng Xuân Đoàn" placeholder="Nhập họ và tên đầy đủ" required>
+                                </div>
+                            </div>
+
+                            <div class="form-row-2">
+                                <div class="form-group">
+                                    <label>Mã sinh viên <span class="required">*</span></label>
+                                    <div class="input-wrapper">
+                                        <i data-lucide="hash" class="input-icon" style="width: 18px; height: 18px;"></i>
+                                        <input type="text" id="studentCode" class="input-control" value="DTC245200226" placeholder="VD: DTC245200226" required>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label>Số điện thoại <span class="required">*</span></label>
+                                    <div class="input-wrapper">
+                                        <i data-lucide="phone" class="input-icon" style="width: 18px; height: 18px;"></i>
+                                        <input type="text" id="phone" class="input-control" value="0912 345 678" placeholder="Nhập số điện thoại" required>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Email liên hệ <span class="required">*</span></label>
+                                <div class="input-wrapper">
+                                    <i data-lucide="mail" class="input-icon" style="width: 18px; height: 18px;"></i>
+                                    <input type="email" id="email" class="input-control" value="doanbg011@gmail.com" placeholder="email@university.edu.vn" required>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Ngành học & Chuyên ngành <span class="required">*</span></label>
+                                <div class="input-wrapper">
+                                    <i data-lucide="book-open" class="input-icon" style="width: 18px; height: 18px;"></i>
+                                    <select id="major" class="input-control">
+                                        <option value="CNTT" selected>Công nghệ thông tin (Kỹ thuật phần mềm)</option>
+                                        <option value="KHMT">Khoa học máy tính & Trí tuệ nhân tạo</option>
+                                        <option value="HTTT">Hệ thống thông tin quản lý</option>
+                                        <option value="ATTT">An toàn thông tin & Mạng</option>
+                                    </select>
+                                    <i data-lucide="chevron-down" class="select-chevron" style="width: 18px; height: 18px;"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </section>
+
+                <!-- CARD 2: TÀI LIỆU THỰC TẬP -->
+                <section class="app-card">
+                    <div class="card-header">
+                        <div class="card-header-left">
+                            <div class="card-header-icon">
+                                <i data-lucide="file-text"></i>
+                            </div>
+                            <div>
+                                <h4>Tài liệu thực tập</h4>
+                                <p>Tải lên hồ sơ bắt buộc theo quy định</p>
+                            </div>
+                        </div>
+                        <span class="file-badge verified" id="fileCountBadge">2 tài liệu đã có</span>
+                    </div>
+
+                    <div class="upload-section">
+                        <!-- Vùng upload kéo thả / chọn file -->
+                        <div class="upload-box" id="dropArea">
+                            <input type="file" id="fileInput" accept=".pdf,.doc,.docx" multiple onchange="handleFileSelect(event)">
+                            <div class="upload-icon-circle">
+                                <i data-lucide="cloud-upload" style="width: 24px; height: 24px;"></i>
+                            </div>
+                            <div class="upload-title">Kéo & thả CV hoặc Đơn xin thực tập vào đây</div>
+                            <div class="upload-desc">Hoặc <span>nhấn vào đây để tải file lên</span> (Hỗ trợ PDF, DOC, DOCX - Tối đa 10MB)</div>
+                        </div>
+
+                        <!-- Danh sách tài liệu đã upload -->
+                        <div class="file-list-group" id="fileList">
+                            <!-- File 1: CV -->
+                            <div class="file-item-card" id="file-cv">
+                                <div class="file-info-left">
+                                    <div class="file-type-icon">PDF</div>
+                                    <div class="file-details">
+                                        <div class="file-name" title="CV_NguyenVanAn_Frontend_Developer.pdf">CV_HoangXuanDoan_FE.pdf</div>
+                                        <div class="file-meta">
+                                            <span>2.4 MB</span>
+                                            <span>•</span>
+                                            <span class="file-badge verified">Đã tải lên</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="file-actions">
+                                    <button class="btn-action" onclick="viewFile('CV_NguyenVanAn_FE.pdf', '2.4 MB', 'PDF')">
+                                        <i data-lucide="eye" style="width: 14px; height: 14px;"></i>
+                                        Xem
+                                    </button>
+                                    <button class="btn-action btn-delete" onclick="deleteFile('file-cv')">
+                                        <i data-lucide="trash-2" style="width: 14px; height: 14px;"></i>
+                                        Xóa
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- File 2: Đơn xin thực tập -->
+                            <div class="file-item-card" id="file-app">
+                                <div class="file-info-left">
+                                    <div class="file-type-icon doc">DOCX</div>
+                                    <div class="file-details">
+                                        <div class="file-name" title="Don_xin_thuc_tap_Doanh_nghiep_2025.docx">Don_xin_thuc_tap.docx</div>
+                                        <div class="file-meta">
+                                            <span>850 KB</span>
+                                            <span>•</span>
+                                            <span class="file-badge waiting">Chờ ký duyệt</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="file-actions">
+                                    <button class="btn-action" onclick="viewFile('Don_xin_thuc_tap.docx', '850 KB', 'DOCX')">
+                                        <i data-lucide="eye" style="width: 14px; height: 14px;"></i>
+                                        Xem
+                                    </button>
+                                    <button class="btn-action btn-delete" onclick="deleteFile('file-app')">
+                                        <i data-lucide="trash-2" style="width: 14px; height: 14px;"></i>
+                                        Xóa
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </section>
+
+            </div>
+
+            <!-- THANH HÀNH ĐỘNG CUỐI TRANG -->
+            <div class="form-actions-bar">
+                <button type="button" class="btn-secondary" onclick="resetForm()">
+                    Làm mới thông tin
+                </button>
+                <button type="button" class="btn-primary" onclick="saveProfile()">
+                    <i data-lucide="save" style="width: 18px; height: 18px;"></i>
+                    Lưu hồ sơ thực tập
+                </button>
+            </div>
+        </main>
+    </div>
+
+    <!-- MODAL XEM CHI TIẾT TÀI LIỆU -->
+    <div class="preview-modal" id="previewModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 id="modalFileName">Chi tiết tài liệu</h4>
+                <button class="modal-close-btn" onclick="closeModal()">
+                    <i data-lucide="x" style="width: 20px; height: 20px;"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div style="font-size: 48px; color: var(--primary); margin-bottom: 12px;">
+                    <i data-lucide="file-check-2" style="width: 56px; height: 56px;"></i>
+                </div>
+                <h5 id="modalFileSize" style="color: var(--text-main); font-size: 15px; margin-bottom: 6px;">Kích thước: 2.4 MB</h5>
+                <p>Tài liệu hợp lệ và đã được hệ thống lưu trữ an toàn trong kho hồ sơ thực tập.</p>
+            </div>
+            <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px;">
+                <button class="btn-secondary" onclick="closeModal()">Đóng</button>
+                <button class="btn-primary" onclick="alert('Đang tải tài liệu về máy tính...'); closeModal();">
+                    <i data-lucide="download" style="width: 16px; height: 16px;"></i>
+                    Tải về máy
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- TOAST NOTIFICATION -->
+    <div class="toast-alert" id="toast">
+        <i data-lucide="check-circle" class="toast-icon" style="width: 24px; height: 24px;"></i>
+        <div class="toast-content">
+            <h5 id="toastTitle">Thành công!</h5>
+            <p id="toastMessage">Hồ sơ thực tập đã được lưu và cập nhật vào hệ thống.</p>
+        </div>
+    </div>
+
+    <!-- ==================== JAVASCRIPT ==================== -->
+    <script>
+        // Khởi tạo icons Lucide
+        lucide.createIcons();
+
+        // 1. Quản lý trạng thái hồ sơ (Chưa hoàn thiện - Đang chờ duyệt - Đã duyệt)
+        const statusConfig = {
+            incomplete: {
+                title: 'Chưa hoàn thiện',
+                color: '#D32F2F',
+                bgColor: '#FFEBEE',
+                icon: 'alert-circle',
+                desc: 'Vui lòng bổ sung đầy đủ thông tin cá nhân, CV và đơn xin thực tập.'
+            },
+            pending: {
+                title: 'Đang chờ duyệt',
+                color: '#ED6C02',
+                bgColor: '#FFF4E5',
+                icon: 'clock',
+                desc: 'Hồ sơ đã đầy đủ CV và Đơn xin thực tập. Giảng viên phụ trách đang kiểm duyệt.'
+            },
+            approved: {
+                title: 'Đã duyệt',
+                color: '#2E7D32',
+                bgColor: '#E8F5E9',
+                icon: 'check-circle-2',
+                desc: 'Chúc mừng! Hồ sơ thực tập của bạn đã được Khoa và Doanh nghiệp phê duyệt.'
+            }
+        };
+
+        function setStatus(statusKey) {
+            // Cập nhật nút active
+            document.querySelectorAll('.status-pill').forEach(btn => btn.classList.remove('active'));
+            const activeBtn = document.querySelector(`.status-pill.${statusKey}`);
+            if (activeBtn) activeBtn.classList.add('active');
+
+            const config = statusConfig[statusKey];
+            const titleEl = document.getElementById('statusDisplayText');
+            const descEl = document.getElementById('statusHintText');
+            const iconWrap = document.getElementById('statusIconWrap');
+
+            titleEl.textContent = config.title;
+            titleEl.style.color = config.color;
+            descEl.textContent = config.desc;
+            iconWrap.style.background = config.bgColor;
+            iconWrap.style.color = config.color;
+
+            iconWrap.innerHTML = `<i data-lucide="${config.icon}"></i>`;
+            lucide.createIcons();
+
+            showToast('Cập nhật trạng thái', `Trạng thái hồ sơ đã chuyển sang "${config.title}"`);
+        }
+
+        // 2. Xử lý upload tài liệu
+        function handleFileSelect(event) {
+            const files = event.target.files;
+            if (!files || files.length === 0) return;
+
+            const fileList = document.getElementById('fileList');
+
+            for (let i = 0; i < files.length; i++) {
+                const file = files[i];
+                const fileId = 'file-' + Date.now() + '-' + i;
+                const extension = file.name.split('.').pop().toUpperCase();
+                const sizeInMB = (file.size / (1024 * 1024)).toFixed(1) + ' MB';
+
+                const card = document.createElement('div');
+                card.className = 'file-item-card';
+                card.id = fileId;
+                card.innerHTML = `
+                    <div class="file-info-left">
+                        <div class="file-type-icon ${extension === 'DOC' || extension === 'DOCX' ? 'doc' : ''}">${extension}</div>
+                        <div class="file-details">
+                            <div class="file-name" title="${file.name}">${file.name}</div>
+                            <div class="file-meta">
+                                <span>${sizeInMB}</span>
+                                <span>•</span>
+                                <span class="file-badge verified">Mới tải lên</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="file-actions">
+                        <button class="btn-action" onclick="viewFile('${file.name}', '${sizeInMB}', '${extension}')">
+                            <i data-lucide="eye" style="width: 14px; height: 14px;"></i>
+                            Xem
+                        </button>
+                        <button class="btn-action btn-delete" onclick="deleteFile('${fileId}')">
+                            <i data-lucide="trash-2" style="width: 14px; height: 14px;"></i>
+                            Xóa
+                        </button>
+                    </div>
+                `;
+                fileList.appendChild(card);
+            }
+
+            updateFileCount();
+            lucide.createIcons();
+            showToast('Tải lên thành công', `Đã thêm ${files.length} tài liệu vào hồ sơ.`);
+            event.target.value = '';
+        }
+
+        function deleteFile(elementId) {
+            const item = document.getElementById(elementId);
+            if (item) {
+                if (confirm('Bạn có chắc chắn muốn xóa tài liệu này?')) {
+                    item.remove();
+                    updateFileCount();
+                    showToast('Đã xóa', 'Tài liệu đã được gỡ khỏi danh sách.');
+                }
+            }
+        }
+
+        function updateFileCount() {
+            const total = document.querySelectorAll('.file-item-card').length;
+            const badge = document.getElementById('fileCountBadge');
+            badge.textContent = `${total} tài liệu đã có`;
+            
+            if (total === 0) {
+                setStatus('incomplete');
+            }
+        }
+
+        // 3. Xem trước file Modal
+        function viewFile(name, size, type) {
+            document.getElementById('modalFileName').textContent = name;
+            document.getElementById('modalFileSize').textContent = `Loại định dạng: ${type} • Kích thước: ${size}`;
+            document.getElementById('previewModal').classList.add('active');
+            lucide.createIcons();
+        }
+
+        function closeModal() {
+            document.getElementById('previewModal').classList.remove('active');
+        }
+
+        // 4. Lưu hồ sơ thực tập
+        function saveProfile() {
+            const name = document.getElementById('fullName').value.trim();
+            const studentCode = document.getElementById('studentCode').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const phone = document.getElementById('phone').value.trim();
+            const totalFiles = document.querySelectorAll('.file-item-card').length;
+
+            if (!name || !studentCode || !email || !phone) {
+                alert('Vui lòng điền đầy đủ các thông tin cá nhân bắt buộc!');
+                return;
+            }
+
+            if (totalFiles === 0) {
+                alert('Vui lòng tải lên ít nhất CV hoặc Đơn xin thực tập để tiếp tục!');
+                return;
+            }
+
+            // Cập nhật tên sinh viên trên header
+            document.querySelector('.user-name').textContent = name;
+
+            showToast('Lưu hồ sơ thành công!', 'Dữ liệu hồ sơ của bạn đã được ghi nhận trên hệ thống.');
+        }
+
+        function resetForm() {
+            if (confirm('Bạn có muốn đặt lại thông tin mẫu?')) {
+                document.getElementById('studentForm').reset();
+                showToast('Thông báo', 'Đã đặt lại thông tin về ban đầu.');
+            }
+        }
+
+        // 5. Toast Thông báo
+        function showToast(title, message) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toastTitle').textContent = title;
+            document.getElementById('toastMessage').textContent = message;
+
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3500);
+        }
+
+        // 6. Navigation Switching
+        function switchNav(button) {
+            document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+            button.classList.add('active');
+        }
+
+        function handleLogout() {
+            if (confirm('Bạn có chắc chắn muốn đăng xuất khỏi hệ thống quản lý thực tập?')) {
+                showToast('Đăng xuất', 'Đang chuyển hướng về trang đăng nhập...');
+            }
+        }
+
+        // 7. Mobile Sidebar Toggle
+        const menuToggle = document.getElementById('menuToggle');
+        const sidebar = document.getElementById('sidebar');
+
+        menuToggle.addEventListener('click', () => {
+            sidebar.classList.toggle('mobile-open');
+        });
+
+        // Close sidebar when clicking outside on mobile
+        document.addEventListener('click', (e) => {
+            if (window.innerWidth <= 1024) {
+                if (!sidebar.contains(e.target) && !menuToggle.contains(e.target) && sidebar.classList.contains('mobile-open')) {
+                    sidebar.classList.remove('mobile-open');
+                }
+            }
+        });
+    </script>
+</body>
+</html>
